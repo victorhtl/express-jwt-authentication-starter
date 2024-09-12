@@ -2,3 +2,6 @@ node_modules/
 angular/node_modules/
 .env
 id_rsa_priv.pem
+id_rsa_pub.pem
+package-lock.json
+angular/package-lock.json
