@@ -6,33 +6,27 @@ const User = require('mongoose').model('User');
 const pathToKey = path.join(__dirname, '..', 'id_rsa_pub.pem');
 const PUB_KEY = fs.readFileSync(pathToKey, 'utf8');
 
-/*
-// This is all possible options that you may need
-const passportJWTOptions = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: PUB_KEY || 'secret',
-    issuer: 'issuer',
-    audience: 'audience',
-    algorithms: ['RS256'],
-    ignoreExpiration: false,
-    passReqToCallback: false,
-    jsonWebTokenOptions: {
-        complete: false,
-        clockTolerance: '',
-        maxAge: '2d', // 2 days
-        clockTimestamp: '100',
-        nonce: 'openId'
-    }
-};
-*/
 
-// This is what we really need
+/**
+ * see https://www.passportjs.org/packages/passport-jwt/ for exploring this options object
+ * 
+ * The ExtractJwt class expects that our jwt token comes as "Bearer ytbnalvfdlg" in Authorization header
+ */
 const options = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), 
     secretOrKey: PUB_KEY,
     algorithms: ['RS256']
 };
 
+/**
+ * this strategy is the same as JwtStrategy used in examples
+ * 
+ * This class will decode the jwt and return the payload
+ * 
+ * You can use any kind of verification. Here, I searched the user in
+ * the database based on the sub field, which is my user id that I 
+ * defined in the payload that I send (routes/user.js)
+ */
 const strategy = new Strategy(options, (payload, done) => {
     User.findOne({ _id: payload.sub })
         .then((user)=> {
