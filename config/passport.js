@@ -1,11 +1,7 @@
-const fs = require('fs');
 const { ExtractJwt, Strategy } = require('passport-jwt');
-const path = require('path');
 const User = require('mongoose').model('User');
 
-const pathToKey = path.join(__dirname, '..', 'id_rsa_pub.pem');
-const PUB_KEY = fs.readFileSync(pathToKey, 'utf8');
-
+require('dotenv').config()
 
 /**
  * see https://www.passportjs.org/packages/passport-jwt/ for exploring this options object
@@ -14,8 +10,7 @@ const PUB_KEY = fs.readFileSync(pathToKey, 'utf8');
  */
 const options = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), 
-    secretOrKey: PUB_KEY,
-    algorithms: ['RS256']
+    secretOrKey: process.env.AUTH_SECRET 
 };
 
 /**
@@ -28,6 +23,7 @@ const options = {
  * defined in the payload that I send (routes/user.js)
  */
 const strategy = new Strategy(options, (payload, done) => {
+    console.log(payload.sub)
     User.findOne({ _id: payload.sub })
         .then((user)=> {
             if(user){

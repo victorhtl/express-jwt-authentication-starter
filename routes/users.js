@@ -3,14 +3,13 @@ const User = mongoose.model('User');
 
 const router = require('express').Router();   
 const bcrypt = require('bcrypt');
-const fs = require('fs')
-const path = require('path');
 const jwt = require('jwt-simple');
+const passport = require('passport');
 
-const pathToKey = path.join(__dirname, '..', 'id_rsa_priv.pem');
-const PRIV_KEY = fs.readFileSync(pathToKey, 'utf8');
+require('dotenv').config()
 
-router.get('/protected', (req, res, next) => {
+router.get('/protected', passport.authenticate('jwt', {session: false}), (req, res, next) => {
+    res.status(200).json({msg: "don't know how it worked but worked"})
 });
 
 function issueJWT(user){
@@ -25,7 +24,7 @@ function issueJWT(user){
 
     return {
         payload,
-        token: jwt.encode(payload, PRIV_KEY)
+        token: jwt.encode(payload, process.env.AUTH_SECRET)
     };
 }
 
@@ -40,7 +39,7 @@ router.post('/login', (req, res, next)=>{
 
                     const jwt = issueJWT(user);
 
-                    res.json({...jwt.payload, token: jwt.token});
+                    res.json({ ...jwt.payload, token: jwt.token});
                 })
                .catch(err => res.status(500).send(err))
         })
