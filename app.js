@@ -3,10 +3,6 @@ const cors = require('cors');
 const path = require('path');
 const passport = require('passport');
 
-/**
- * -------------- GENERAL SETUP ----------------
- */
-
 // Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
 require('dotenv').config();
 
@@ -37,17 +33,14 @@ app.use(cors());
 // When you run `ng build`, the output will go to the ./public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-/**
- * -------------- ROUTES ----------------
- */
-
 // Imports all of the routes from ./routes/index.js
-app.use(require('./routes'));
+const users = require('./routes/users')
+app.use('/users', users);
 
 
-/**
- * -------------- SERVER ----------------
- */
-
-// Server listens on http://localhost:3000
-app.listen(3000);
+const port = 3001
+app.listen(port, ()=>{
+    console.log(`Running on port ${port}`);
+    console.log('Wait for "Database connected"');
+    console.log('See Readme for usage details')
+});
